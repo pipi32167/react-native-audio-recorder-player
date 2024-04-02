@@ -1,4 +1,4 @@
-import type {EmitterSubscription} from 'react-native';
+import type { EmitterSubscription } from 'react-native';
 import {
   DeviceEventEmitter,
   NativeEventEmitter,
@@ -6,7 +6,7 @@ import {
   Platform,
 } from 'react-native';
 
-const {RNAudioRecorderPlayer} = NativeModules;
+const { RNAudioRecorderPlayer } = NativeModules;
 
 export enum AudioSourceAndroidType {
   DEFAULT = 0,
@@ -197,7 +197,14 @@ class AudioRecorderPlayer {
 
       this._recorderSubscription = myModuleEvt.addListener(
         'rn-recordback',
-        callback,
+        (recordingMeta: RecordBackType) => {
+          if (recordingMeta.isRecording === false && !this._hasPausedRecord) {
+            this._hasPausedRecord = true;
+          } else if (recordingMeta.isRecording === true && this._hasPausedRecord) {
+            this._hasPausedRecord = false
+          }
+          callback(recordingMeta)
+        },
       );
     }
   };

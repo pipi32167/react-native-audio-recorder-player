@@ -197,7 +197,14 @@ class AudioRecorderPlayer {
 
       this._recorderSubscription = myModuleEvt.addListener(
         'rn-recordback',
-        callback,
+        (recordingMeta: RecordBackType) => {
+          if (recordingMeta.isRecording === false && !this._hasPausedRecord) {
+            this._hasPausedRecord = true;
+          } else if (recordingMeta.isRecording === true && this._hasPausedRecord) {
+            this._hasPausedRecord = false
+          }
+          callback(recordingMeta)
+        },
       );
     }
   };

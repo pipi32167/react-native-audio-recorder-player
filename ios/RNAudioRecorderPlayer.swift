@@ -158,6 +158,22 @@ class RNAudioRecorderPlayer: RCTEventEmitter, AVAudioRecorderDelegate {
         switch interruptionType {
         case AVAudioSession.InterruptionType.began.rawValue:
             pauseRecorder { _ in } rejecter: { _, _, _ in }
+            if (audioRecorder != nil) {
+                var currentMetering: Float = 0
+
+                if (_meteringEnabled) {
+                    audioRecorder.updateMeters()
+                    currentMetering = audioRecorder.averagePower(forChannel: 0)
+                }
+
+                let status = [
+                    "isRecording": false,
+                    "currentPosition": audioRecorder.currentTime * 1000,
+                    "currentMetering": currentMetering,
+                ] as [String : Any];
+
+                sendEvent(withName: "rn-recordback", body: status)
+            }
             break
         case AVAudioSession.InterruptionType.ended.rawValue:
             resumeRecorder { _ in } rejecter: { _, _, _ in }

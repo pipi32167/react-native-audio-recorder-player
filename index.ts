@@ -142,6 +142,7 @@ const pad = (num: number): string => {
 
 export type RecordBackType = {
   isRecording?: boolean;
+  isInterrupted?: boolean;
   currentPosition: number;
   currentMetering?: number;
 };
@@ -157,6 +158,7 @@ class AudioRecorderPlayer {
   private _isPlaying: boolean = false;
   private _hasPaused: boolean = false;
   private _hasPausedRecord: boolean = false;
+  private _hasInterruptedRecord: boolean = false;
   private _recorderSubscription?: EmitterSubscription;
   private _playerSubscription?: EmitterSubscription;
   private _playerCallback?: (event: PlayBackType) => void;
@@ -198,10 +200,10 @@ class AudioRecorderPlayer {
       this._recorderSubscription = myModuleEvt.addListener(
         'rn-recordback',
         (recordingMeta: RecordBackType) => {
-          if (recordingMeta.isRecording === false && !this._hasPausedRecord) {
-            this._hasPausedRecord = true;
-          } else if (recordingMeta.isRecording === true && this._hasPausedRecord) {
-            this._hasPausedRecord = false
+          if (recordingMeta.isInterrupted === true && !this._hasInterruptedRecord) {
+            this._hasInterruptedRecord = true;
+          } else if (recordingMeta.isInterrupted === false && this._hasInterruptedRecord) {
+            this._hasInterruptedRecord = false
           }
           callback(recordingMeta)
         },
@@ -248,6 +250,9 @@ class AudioRecorderPlayer {
     audioSets?: AudioSet,
     meteringEnabled?: boolean,
   ): Promise<string> => {
+    if (this._hasInterruptedRecord) {
+      throw new Error('Interrupted recording');
+    }
     if (!this._isRecording) {
       this._isRecording = true;
 
@@ -266,6 +271,9 @@ class AudioRecorderPlayer {
    * @returns {Promise<string>}
    */
   pauseRecorder = async (): Promise<string> => {
+    if (this._hasInterruptedRecord) {
+      throw new Error('Interrupted recording');
+    }
     if (!this._hasPausedRecord) {
       this._hasPausedRecord = true;
 
@@ -280,6 +288,9 @@ class AudioRecorderPlayer {
    * @returns {Promise<string>}
    */
   resumeRecorder = async (): Promise<string> => {
+    if (this._hasInterruptedRecord) {
+      throw new Error('Interrupted recording');
+    }
     if (this._hasPausedRecord) {
       this._hasPausedRecord = false;
 
@@ -294,6 +305,9 @@ class AudioRecorderPlayer {
    * @returns {Promise<string>}
    */
   stopRecorder = async (): Promise<string> => {
+    if (this._hasInterruptedRecord) {
+      throw new Error('Interrupted recording');
+    }
     if (this._isRecording) {
       this._isRecording = false;
       this._hasPausedRecord = false;

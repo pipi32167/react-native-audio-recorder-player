@@ -366,6 +366,15 @@ class RNAudioRecorderPlayerModule(private val reactContext: ReactApplicationCont
         promise.resolve("setSubscriptionDuration: $subsDurationMillis")
     }
 
+    @ReactMethod
+    fun getDuration(promise: Promise) {
+        if (mediaPlayer != null) {
+            promise.resolve(mediaPlayer!!.duration)
+        } else {
+            promise.resolve("Cannot get duration, player is null.")
+        }
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray): Boolean {
         var requestRecordAudioPermission: Int = 200
 

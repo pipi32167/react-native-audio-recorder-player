@@ -48,4 +48,6 @@ RCT_EXTERN_METHOD(pausePlayer:(RCTPromiseResolveBlock)resolve
 RCT_EXTERN_METHOD(stopPlayer:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject);
 
+RCT_EXTERN_METHOD(getDuration:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject);
 @end

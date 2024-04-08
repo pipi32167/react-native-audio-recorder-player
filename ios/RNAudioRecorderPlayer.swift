@@ -521,4 +521,16 @@ class RNAudioRecorderPlayer: RCTEventEmitter, AVAudioRecorderDelegate {
         audioPlayer.volume = volume
         resolve(volume)
     }
+
+    @objc(getDuration:resolve:rejecter:)
+    public func getDuration(
+        resolve: @escaping RCTPromiseResolveBlock,
+        rejecter reject: @escaping RCTPromiseRejectBlock
+    ) -> Void {
+        if let duration = audioPlayer.currentItem?.asset.duration.seconds {
+            resolve(duration * 1000)     
+        } else {
+            reject("RNAudioPlayerRecorder", "Failed to get duration", nil)
+        }
+    }
 }
